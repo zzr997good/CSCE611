@@ -4,7 +4,7 @@ LD=i386-elf-ld
 
 GCC_OPTIONS = -m32 -nostdlib -fno-builtin -nostartfiles -nodefaultlibs -fno-exceptions -fno-rtti -fno-stack-protector -fleading-underscore -fno-asynchronous-unwind-tables
 
-all: kernel.elf
+all: kernel.bin
 
 clean:
 	rm -f *.o *.bin
@@ -30,9 +30,7 @@ kernel.o: kernel.C
 	$(GCC) $(GCC_OPTIONS) -g -c -o kernel.o kernel.C
 
 
-# kernel.bin: start.o kernel.o console.o utils.o linker.ld
-#	$(LD) -melf_i386 -T linker.ld -o kernel.bin start.o kernel.o console.o utils.o
+kernel.bin: start.o kernel.o console.o utils.o linker.ld
+	$(LD) -melf_i386 -T linker.ld -o kernel.bin start.o kernel.o console.o utils.o
 
-kernel.elf: start.o kernel.o console.o utils.o linker.ld
-	$(LD) -melf_i386 -T linker.ld -o kernel.elf start.o kernel.o console.o utils.o
 

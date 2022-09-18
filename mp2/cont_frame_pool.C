@@ -237,9 +237,15 @@ unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
                                       unsigned long _n_frames)
 {
-    // TODO: IMPLEMENTATION NEEEDED!
-    Console::puts("ContframePool::mark_inaccessible not implemented!\n");
-    assert(false);
+//    Console::puts("ContframePool::mark_inaccessible not implemented!\n");
+//    assert(false)
+    assert ((_base_frame_no >= base_frame_no) && (_base_frame_no < base_frame_no + n_frames));
+    assert ((_base_frame_no + _n_frames >= base_frame_no) && (_base_frame_no + _n_frames < base_frame_no + n_frames));
+    for(unsigned long abs_fno = _base_frame_no; abs_fno < _base_frame_no + _n_frames; abs_fno++){
+            set_state(abs_fno-base_frame_no, FrameState::Inacs);
+            nFreeFrames--;                                                  //Reduce the free frames count
+        }
+    Console::puts("ContFramePool::mark_inaccessible - Memory marked inaccessigble\n");
 }
 
 void ContFramePool::release_frames(unsigned long _first_frame_no)

@@ -52,7 +52,7 @@ private:
     bitmap_char_s* bitmap;       // We implement the simple frame pool with a bitmap
     unsigned int    nFreeFrames;   //
     unsigned long   base_frame_no; // Where does the frame pool start in phys mem?
-    unsigned long   nframes;       // Size of the frame pool
+    unsigned long   n_frames;       // Size of the frame pool
     unsigned long   info_frame_no; // Where do we store the management information?
     unsigned long   n_info_frames; // Number of frames calculate by needed_info_frames()
     ContFramePool*  next;

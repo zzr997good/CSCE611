@@ -184,11 +184,10 @@ ContFramePool::ContFramePool(unsigned long _base_frame_no,
                              unsigned long _n_frames,
                              unsigned long _info_frame_no)
 {
-    // TODO: IMPLEMENTATION NEEEDED!
     //Console::puts("ContframePool::Constructor not implemented!\n");
     //assert(false);
     base_frame_no = _base_frame_no;
-    nframes = _n_frames;
+    n_frames = _n_frames;
     nFreeFrames = _n_frames;
     info_frame_no = _info_frame_no;
     
@@ -202,7 +201,31 @@ ContFramePool::ContFramePool(unsigned long _base_frame_no,
     {
         bitmap = (bitmap_char_s *) (info_frame_no * FRAME_SIZE);
     }
+    
+    for(int fno = 0; fno < _n_frames; fno++) {
+        set_state(fno, FrameState::Free);
+    }
+    
+    //If info_frame_no==0, the pool info is stored in the first frame of pool, which always happens in kernel pool
+    //If info_frame_no!=0, the pool info is stored in the kernel pool, so all frames in process pool are free, which always happens in process pool
+    if(info_frame_no == 0)  {
+        set_state(0, FrameState::HoS);
+        nFreeFrames--;
+    }
+    
+    //Link this pool to the tail of pool list
+    if(ContFramePool::head==nullptr) {
+        ContFramePool::head=this;
+        ContFramePool::tail=this;
+    }
+    else{
+        ContFramePool::tail->next=this;
+        ContFramePool::tail=this;
+    }
+    next=nullptr;
+    Console::puts("ContframePool::Frame pool is initialized!\n");
 }
+
 
 unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 {

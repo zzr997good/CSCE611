@@ -184,8 +184,8 @@ ContFramePool::ContFramePool(unsigned long _base_frame_no,
                              unsigned long _n_frames,
                              unsigned long _info_frame_no)
 {
-    //Console::puts("ContframePool::Constructor not implemented!\n");
-    //assert(false);
+//  Console::puts("ContframePool::Constructor not implemented!\n");
+//  assert(false);
     base_frame_no = _base_frame_no;
     n_frames = _n_frames;
     nFreeFrames = _n_frames;
@@ -244,14 +244,18 @@ void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
 
 void ContFramePool::release_frames(unsigned long _first_frame_no)
 {
-    // TODO: IMPLEMENTATION NEEEDED!
-    Console::puts("ContframePool::release_frames not implemented!\n");
-    assert(false);
+
+//    Console::puts("ContframePool::release_frames not implemented!\n");
+//    assert(false);
 }
 
 unsigned long ContFramePool::needed_info_frames(unsigned long _n_frames)
 {
-    // TODO: IMPLEMENTATION NEEEDED!
-    Console::puts("ContframePool::need_info_frames not implemented!\n");
-    assert(false);
+
+//    Console::puts("ContframePool::need_info_frames not implemented!\n");
+//    assert(false);
+    
+    //1 byte bitmap can represent 4 frames
+    //1 frame_size bitmap can represent 4*frame_size frames
+    return (_n_frames+4*FRAME_SIZE-1)/(4*FRAME_SIZE);
 }

@@ -127,40 +127,108 @@
 /* METHODS FOR CLASS   C o n t F r a m e P o o l */
 /*--------------------------------------------------------------------------*/
 
+ContFramePool::FrameState ContFramePool::get_state(unsigned long _frame_no) {
+    unsigned char val ;
+    unsigned int bitmap_index = _frame_no / 4;
+    unsigned int inner_index = _frame_no % 4;
+    if(inner_index == 0)  val = bitmap[bitmap_index].bmp0;
+    if(inner_index == 1)  val = bitmap[bitmap_index].bmp1;
+    if(inner_index == 2)  val = bitmap[bitmap_index].bmp2;
+    if(inner_index == 3)  val = bitmap[bitmap_index].bmp3;
+    FrameState state;
+    switch (val) {
+        case 0x0:
+            state=FrameState::Free;
+            break;
+        case 0x1:
+            state=FrameState::HoS;
+            break;
+        case 0x2:
+            state=FrameState::Inacs;
+            break;
+        case 0x3:
+            state=FrameState::Used;
+            break;
+    }
+    return state;
+    
+}
+
+void ContFramePool::set_state(unsigned long _frame_no, FrameState _state) {
+    unsigned int bitmap_index = _frame_no / 4;
+    unsigned int inner_index = _frame_no % 4;
+    unsigned char val;
+    switch (_state) {
+        case FrameState::Free:
+            val=0x0;
+            break;
+        case FrameState::HoS:
+            val=0x1;
+            break;
+        case FrameState::Inacs:
+            val=0x2;
+            break;
+        case FrameState::Used:
+            val=0x3;
+            break;
+    }
+    if(inner_index == 0)  bitmap[bitmap_index].bmp0=val;;
+    if(inner_index == 1)  bitmap[bitmap_index].bmp1=val;
+    if(inner_index == 2)  bitmap[bitmap_index].bmp2=val;
+    if(inner_index == 3)  bitmap[bitmap_index].bmp3=val;
+    
+}
+
+
 ContFramePool::ContFramePool(unsigned long _base_frame_no,
                              unsigned long _n_frames,
                              unsigned long _info_frame_no)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-   // Console::puts("ContframePool::Constructor not implemented!\n");
-   // assert(false);
+    //Console::puts("ContframePool::Constructor not implemented!\n");
+    //assert(false);
+    base_frame_no = _base_frame_no;
+    nframes = _n_frames;
+    nFreeFrames = _n_frames;
+    info_frame_no = _info_frame_no;
+    
+    //If this is a kernel pool, info_frame_no==0 and the first frame of kernel pool should save the kernel pool info
+    if(info_frame_no == 0)
+    {
+        bitmap = (bitmap_char_s *) (base_frame_no * FRAME_SIZE);
+    }
+    //If this is a process pool, info_frame_no!=0 and one allocated frame of kernel pool should save the process pool info
+    else
+    {
+        bitmap = (bitmap_char_s *) (info_frame_no * FRAME_SIZE);
+    }
 }
 
 unsigned long ContFramePool::get_frames(unsigned int _n_frames)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-   // Console::puts("ContframePool::get_frames not implemented!\n");
-    // assert(false);
+    Console::puts("ContframePool::get_frames not implemented!\n");
+    assert(false);
 }
 
 void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
                                       unsigned long _n_frames)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-    //Console::puts("ContframePool::mark_inaccessible not implemented!\n");
-    //assert(false);
+    Console::puts("ContframePool::mark_inaccessible not implemented!\n");
+    assert(false);
 }
 
 void ContFramePool::release_frames(unsigned long _first_frame_no)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-   // Console::puts("ContframePool::release_frames not implemented!\n");
-    //assert(false);
+    Console::puts("ContframePool::release_frames not implemented!\n");
+    assert(false);
 }
 
 unsigned long ContFramePool::needed_info_frames(unsigned long _n_frames)
 {
     // TODO: IMPLEMENTATION NEEEDED!
-    //Console::puts("ContframePool::need_info_frames not implemented!\n");
-    //assert(false);
+    Console::puts("ContframePool::need_info_frames not implemented!\n");
+    assert(false);
 }

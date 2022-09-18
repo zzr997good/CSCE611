@@ -32,7 +32,13 @@
 /* DATA STRUCTURES */
 /*--------------------------------------------------------------------------*/
 
-/* -- (none) -- */
+typedef struct bitmap_char_
+{
+    unsigned char bmp0 : 2;
+    unsigned char bmp1 : 2;
+    unsigned char bmp2 : 2;
+    unsigned char bmp3 : 2;
+} bitmap_char_s;
 
 /*--------------------------------------------------------------------------*/
 /* C o n t F r a m e   P o o l  */
@@ -43,11 +49,23 @@ class ContFramePool {
 private:
     /* -- DEFINE YOUR CONT FRAME POOL DATA STRUCTURE(s) HERE. */
     
+    bitmap_char_s* bitmap;       // We implement the simple frame pool with a bitmap
+    unsigned int    nFreeFrames;   //
+    unsigned long   base_frame_no; // Where does the frame pool start in phys mem?
+    unsigned long   nframes;       // Size of the frame pool
+    unsigned long   info_frame_no; // Where do we store the management information?
+    unsigned long   n_info_frames; // Number of frames calculate by needed_info_frames()
+    ContFramePool*  next;
     
+    
+    static ContFramePool* head;
+    static ContFramePool* tail;
     
     /* ---- STATE MANAGEMENT */
     
-    enum class FrameState {Free, Used, HoS};
+    
+    /// Free=00   Used=11 Hos=01 Inacs=10
+    enum class FrameState {Free, Used, HoS, Inacs};
 
     FrameState get_state(unsigned long _frame_no);
     void set_state(unsigned long _frame_no, FrameState _state);

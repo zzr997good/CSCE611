@@ -121,7 +121,8 @@
 /* FORWARDS */
 /*--------------------------------------------------------------------------*/
 
-/* -- (none) -- */
+ContFramePool* ContFramePool::head;
+ContFramePool* ContFramePool::tail;
 
 /*--------------------------------------------------------------------------*/
 /* METHODS FOR CLASS   C o n t F r a m e P o o l */

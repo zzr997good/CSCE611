@@ -214,7 +214,7 @@ ContFramePool::ContFramePool(unsigned long _base_frame_no,
     }
     
     //Link this pool to the tail of pool list
-    if(ContFramePool::head==nullptr) {
+    if(ContFramePool::head==NULL) {
         ContFramePool::head=this;
         ContFramePool::tail=this;
     }
@@ -222,7 +222,7 @@ ContFramePool::ContFramePool(unsigned long _base_frame_no,
         ContFramePool::tail->next=this;
         ContFramePool::tail=this;
     }
-    next=nullptr;
+    next=NULL;
     Console::puts("ContframePool::Frame pool is initialized!\n");
 }
 
@@ -297,11 +297,55 @@ void ContFramePool::mark_inaccessible(unsigned long _base_frame_no,
     Console::puts("ContFramePool::mark_inaccessible - Memory marked inaccessigble\n");
 }
 
+
+void ContFramePool::release_from_my_pool(unsigned long _first_frame_no)
+{
+    //Make Sure this frame should be in the state of Used, instead of
+    if(get_state(_first_frame_no-base_frame_no)!=FrameState::HoS){
+        Console::puts("Frame not head of sequence in one pool, cannot release \n");
+        return;
+    }
+    else{
+        unsigned long i = _first_frame_no;
+        //Release the head first
+        set_state(i - base_frame_no,FrameState::Free);
+        nFreeFrames++;
+        i++;
+        //Release frame one by one
+        while(i-base_frame_no<n_frames&&get_state(i - base_frame_no)== FrameState::Used)
+        {
+            set_state(i - base_frame_no,FrameState::Free);     //release one frame
+            nFreeFrames++;                  //Increase free count
+            i++;
+        }
+        Console::puts("ContFramePool::release_frames - Frame sequence released\n");
+    }
+}
+
+
 void ContFramePool::release_frames(unsigned long _first_frame_no)
 {
     
     //    Console::puts("ContframePool::release_frames not implemented!\n");
     //    assert(false);
+    ContFramePool* cur = ContFramePool::head;
+    while(cur != NULL)
+    {
+        if((_first_frame_no >= cur->base_frame_no) && (_first_frame_no < cur->base_frame_no + cur->n_frames))
+        {
+            //Framepool found
+            break;
+        }
+        cur = cur->next;
+    }
+    
+    //Cant find this frame in any pool
+    if(cur==NULL){
+        Console::puts("Frame not found in any pool, cannot release. \n");
+        return;
+    }
+    //Release frames using the private release function of this pool management
+    cur->release_from_my_pool(_first_frame_no);
 }
 
 unsigned long ContFramePool::needed_info_frames(unsigned long _n_frames)

@@ -70,6 +70,8 @@ private:
     FrameState get_state(unsigned long _frame_no);
     void set_state(unsigned long _frame_no, FrameState _state);
     
+    void release_from_my_pool(unsigned long _first_frame_no);
+    
     
 public:
 

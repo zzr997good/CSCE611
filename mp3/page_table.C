@@ -54,7 +54,10 @@ void PageTable::load()
 
 void PageTable::enable_paging()
 {
-   assert(false);
+   //assert(false);
+   //Before enable_paging(),we need to make sure page directory already load into CR3
+   assert((unsigned long)(current_page_table->page_directory)==read_cr3());
+   write_cr0(read_cr0() | CR0_PAGING_BIT);
    Console::puts("Enabled paging\n");
 }
 

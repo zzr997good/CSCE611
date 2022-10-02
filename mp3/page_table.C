@@ -26,7 +26,20 @@ void PageTable::init_paging(ContFramePool * _kernel_mem_pool,
 PageTable::PageTable()
 {
    //assert(false);
-   
+   page_directory=(unsigned long *)(kernel_mem_pool->get_frames(1)<<PHYSICAL_ADDRESS_START);
+   unsigned long* page_table=(unsigned long *)(kernel_mem_pool->get_frames(1)<<PHYSICAL_ADDRESS_START);//we turn this to unsigned long* cus each PTE is 4B and unsigned long is also 4B
+   unsigned long physical_address=0;
+   //Fill the first page table page to mark first 4MB in physical memory as "present"
+   for(int i=0;i<Machine::PT_ENTRIES_PER_PAGE;i++){
+      page_table[i]=physical_address|S_W_P;
+      physical_address+=Machine::PAGE_SIZE;
+   }
+   //Fill the first PDE and mark otehr PDE as "not present"
+   page_directory[0]=((unsigned long)page_table)|S_W_P;
+   for(int i=1;i<Machine::PT_ENTRIES_PER_PAGE;i++){
+      page_directory[i]=0|S_W_NP;
+   }
+
    Console::puts("Constructed Page Table object\n");
 }
 

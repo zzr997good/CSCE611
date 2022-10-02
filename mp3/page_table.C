@@ -92,8 +92,7 @@ void PageTable::handle_fault(REGS *_r)
       break;
    }
 
-   if (_r->err_code & 0x1 == 0x0)
-   { // Page not present
+   if ((_r->err_code & 0x1) == 0x0){ // Page not present
       unsigned long *current_page_directory = (unsigned long *)read_cr3();
       unsigned long frame_address = (process_mem_pool->get_frames(1)) << 12; //frame address allocated to store the new page
       unsigned long virtual_address = read_cr2();        //virtual address which triggers page fault

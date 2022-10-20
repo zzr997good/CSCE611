@@ -88,7 +88,25 @@ void PageTable::handle_fault(REGS * _r)
 
 void PageTable::register_pool(VMPool * _vm_pool)
 {
-    assert(false);
+    //assert(false);
+    //First, check whether _vm_pool is already registered
+    VMPool *cur=vm_pool_list_head;
+    while(cur!=NULL){
+        if(cur==_vm_pool){
+            Console::puts("VM pool is registered in the past\n");
+            return;
+        }
+        cur=cur->next;
+    }
+    //If not, register it
+    if(vm_pool_list_head==NULL){
+        vm_pool_list_head=_vm_pool;
+        vm_pool_list_tail=_vm_pool;
+    }
+    else{
+        vm_pool_list_tail->next=_vm_pool;
+        vm_pool_list_tail=_vm_pool;
+    }
     Console::puts("registered VM pool\n");
 }
 

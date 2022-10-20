@@ -15,27 +15,69 @@ void PageTable::init_paging(ContFramePool * _kernel_mem_pool,
                             ContFramePool * _process_mem_pool,
                             const unsigned long _shared_size)
 {
-    assert(false);
-    Console::puts("Initialized Paging System\n");
+   // assert(false);
+   kernel_mem_pool = _kernel_mem_pool;
+   process_mem_pool = _process_mem_pool;
+   shared_size = _shared_size;
+   Console::puts("Initialized Paging System\n");
 }
 
 PageTable::PageTable()
 {
-    assert(false);
-    Console::puts("Constructed Page Table object\n");
+   // assert(false);
+   page_directory = (unsigned long *)(process_mem_pool->get_frames(1) << 12);
+   unsigned long *page_table = (unsigned long *)(process_mem_pool->get_frames(1) << 12); // we turn this to unsigned long* cus each PTE is 4B and unsigned long is also 4B
+   unsigned long physical_address = 0;
+   // Fill the first page table page to mark first 4MB in physical memory as "present"
+   for (int i = 0; i < Machine::PT_ENTRIES_PER_PAGE; i++)
+   {
+      page_table[i] = physical_address | 0x3;
+      physical_address += Machine::PAGE_SIZE;
+   }
+   // Fill the first PDE and mark otehr PDE as "not present"
+   page_directory[0] = ((unsigned long)page_table) | 0x3;
+   page_directory[Machine::PT_ENTRIES_PER_PAGE-1]=((unsigned long)page_directory)| 0x3;
+   for (int i = 1; i < Machine::PT_ENTRIES_PER_PAGE-1; i++)
+   {
+      page_directory[i] = 0 | 0x2;
+   }
+    vm_pool_list_head = NULL;
+    vm_pool_list_tail= NULL;
+   Console::puts("Constructed Page Table object\n");
 }
 
 
 void PageTable::load()
 {
-    assert(false);
-    Console::puts("Loaded page table\n");
+   // assert(false);
+   current_page_table = this;
+   write_cr3((unsigned long)page_directory);
+   Console::puts("Loaded page table\n");
 }
 
 void PageTable::enable_paging()
 {
-    assert(false);
-    Console::puts("Enabled paging\n");
+   // assert(false);
+   // Before enable_paging(),we need to make sure page directory already load into CR3
+   assert((unsigned long)(current_page_table->page_directory) == read_cr3());
+   paging_enabled = 1;
+   write_cr0(read_cr0() | 0x80000000);
+   Console::puts("Enabled paging\n");
+}
+
+unsigned long * PageTable::PDE_address(unsigned long addr)
+{
+	unsigned long pde_index = (addr & 0xFFC00000) >> 22;
+	return (unsigned long *)(0xFFFFF000|(pde_index << 2));                                           
+	
+}
+
+unsigned long * PageTable::PTE_address(unsigned long addr)
+{
+	unsigned long pde_index = (addr & 0xFFC00000) >> 22;
+	unsigned long pte_index = (addr & 0x003FF000) >> 12;
+	return (unsigned long *)(0xFFC00000 | (pde_index << 12) | (pte_index << 2));       
+	
 }
 
 void PageTable::handle_fault(REGS * _r)

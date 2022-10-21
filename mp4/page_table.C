@@ -111,6 +111,15 @@ void PageTable::register_pool(VMPool * _vm_pool)
 }
 
 void PageTable::free_page(unsigned long _page_no) {
-    assert(false);
+    //assert(false);
+    unsigned long addr=(_page_no<<12);
+    //unsigned long* pde_addr=PDE_address(addr);
+    unsigned long* pte_addr=PTE_address(addr);
+    if(*pte_addr & 0x1){
+        ContFramePool::release_frames(*pte_addr >> 12);
+        *pte_addr = *pte_addr & 0xFFFFFFCE; //invalid, unused, undirty
+        unsigned int cr3_read = read_cr3();
+        write_cr3(cr3_read);
+    }
     Console::puts("freed page\n");
 }

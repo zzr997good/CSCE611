@@ -4,179 +4,180 @@
 #include "paging_low.H"
 #include "page_table.H"
 
-PageTable * PageTable::current_page_table = NULL;
+PageTable *PageTable::current_page_table = NULL;
 unsigned int PageTable::paging_enabled = 0;
-ContFramePool * PageTable::kernel_mem_pool = NULL;
-ContFramePool * PageTable::process_mem_pool = NULL;
+ContFramePool *PageTable::kernel_mem_pool = NULL;
+ContFramePool *PageTable::process_mem_pool = NULL;
 unsigned long PageTable::shared_size = 0;
 
-
-void PageTable::init_paging(ContFramePool * _kernel_mem_pool,
-                            ContFramePool * _process_mem_pool,
+void PageTable::init_paging(ContFramePool *_kernel_mem_pool,
+                            ContFramePool *_process_mem_pool,
                             const unsigned long _shared_size)
 {
-   // assert(false);
-   kernel_mem_pool = _kernel_mem_pool;
-   process_mem_pool = _process_mem_pool;
-   shared_size = _shared_size;
-   Console::puts("Initialized Paging System\n");
+    // assert(false);
+    kernel_mem_pool = _kernel_mem_pool;
+    process_mem_pool = _process_mem_pool;
+    shared_size = _shared_size;
+    Console::puts("Initialized Paging System\n");
 }
 
 PageTable::PageTable()
 {
-   // assert(false);
-   page_directory = (unsigned long *)(process_mem_pool->get_frames(1) << 12);
-   unsigned long *page_table = (unsigned long *)(process_mem_pool->get_frames(1) << 12); // we turn this to unsigned long* cus each PTE is 4B and unsigned long is also 4B
-   unsigned long physical_address = 0;
-   // Fill the first page table page to mark first 4MB in physical memory as "present"
-   for (int i = 0; i < Machine::PT_ENTRIES_PER_PAGE; i++)
-   {
-      page_table[i] = physical_address | 0x3;
-      physical_address += Machine::PAGE_SIZE;
-   }
-   // Fill the first PDE and mark otehr PDE as "not present"
-   page_directory[0] = ((unsigned long)page_table) | 0x3;
-   page_directory[Machine::PT_ENTRIES_PER_PAGE-1]=((unsigned long)page_directory)| 0x3;
-   for (int i = 1; i < Machine::PT_ENTRIES_PER_PAGE-1; i++)
-   {
-      page_directory[i] = 0 | 0x2;
-   }
+    // assert(false);
+    page_directory = (unsigned long *)(process_mem_pool->get_frames(1) << 12);
+    unsigned long *page_table = (unsigned long *)(process_mem_pool->get_frames(1) << 12); // we turn this to unsigned long* cus each PTE is 4B and unsigned long is also 4B
+    unsigned long physical_address = 0;
+    // Fill the first page table page to mark first 4MB in physical memory as "present"
+    for (int i = 0; i < Machine::PT_ENTRIES_PER_PAGE; i++)
+    {
+        page_table[i] = physical_address | 0x3;
+        physical_address += Machine::PAGE_SIZE;
+    }
+    // Fill the first PDE and mark otehr PDE as "not present"
+    page_directory[0] = ((unsigned long)page_table) | 0x3;
+    page_directory[Machine::PT_ENTRIES_PER_PAGE - 1] = ((unsigned long)page_directory) | 0x3;
+    for (int i = 1; i < Machine::PT_ENTRIES_PER_PAGE - 1; i++)
+    {
+        page_directory[i] = 0 | 0x2;
+    }
     vm_pool_list_head = NULL;
-    vm_pool_list_tail= NULL;
-   Console::puts("Constructed Page Table object\n");
+    vm_pool_list_tail = NULL;
+    Console::puts("Constructed Page Table object\n");
 }
-
 
 void PageTable::load()
 {
-   // assert(false);
-   current_page_table = this;
-   write_cr3((unsigned long)page_directory);
-   Console::puts("Loaded page table\n");
+    // assert(false);
+    current_page_table = this;
+    write_cr3((unsigned long)page_directory);
+    Console::puts("Loaded page table\n");
 }
 
 void PageTable::enable_paging()
 {
-   // assert(false);
-   // Before enable_paging(),we need to make sure page directory already load into CR3
-   assert((unsigned long)(current_page_table->page_directory) == read_cr3());
-   paging_enabled = 1;
-   write_cr0(read_cr0() | 0x80000000);
-   Console::puts("Enabled paging\n");
+    // assert(false);
+    // Before enable_paging(),we need to make sure page directory already load into CR3
+    assert((unsigned long)(current_page_table->page_directory) == read_cr3());
+    paging_enabled = 1;
+    write_cr0(read_cr0() | 0x80000000);
+    Console::puts("Enabled paging\n");
 }
 
-unsigned long * PageTable::PDE_address(unsigned long addr)
+unsigned long *PageTable::PDE_address(unsigned long addr)
 {
-	unsigned long pde_index = (addr & 0xFFC00000) >> 22;
-	return (unsigned long *)(0xFFFFF000|(pde_index << 2));                                           
-	
+    unsigned long pde_index = (addr & 0xFFC00000) >> 22;
+    return (unsigned long *)(0xFFFFF000 | (pde_index << 2));
 }
 
-unsigned long * PageTable::PTE_address(unsigned long addr)
+unsigned long *PageTable::PTE_address(unsigned long addr)
 {
-	unsigned long pde_index = (addr & 0xFFC00000) >> 22;
-	unsigned long pte_index = (addr & 0x003FF000) >> 12;
-	return (unsigned long *)(0xFFC00000 | (pde_index << 12) | (pte_index << 2));       
-	
+    unsigned long pde_index = (addr & 0xFFC00000) >> 22;
+    unsigned long pte_index = (addr & 0x003FF000) >> 12;
+    return (unsigned long *)(0xFFC00000 | (pde_index << 12) | (pte_index << 2));
 }
 
-void PageTable::handle_fault(REGS * _r)
+void PageTable::handle_fault(REGS *_r)
 {
-   // assert(false);
-   switch (_r->err_code & (0x7))
-   {
-   case 0x7:
-      Console::puts("Error Code : User|Write|Protection Fault\n");
-      break;
-   case 0x6:
-      Console::puts("Error Code : User|Write|Not Present\n");
-      break;
-   case 0x5:
-      Console::puts("Error Code : User|Read|Protection Fault\n");
-      break;
-   case 0x4:
-      Console::puts("Error Code : User|Read|Not Present\n");
-      break;
-   case 0x3:
-      Console::puts("Error Code : Kernel|Write|Protection Fault\n");
-      break;
-   case 0x2:
-      Console::puts("Error Code : Kernel|Write|Not Present\n");
-      break;
-   case 0x1:
-      Console::puts("Error Code : Kernel|Read|Protection Fault\n");
-      break;
-   case 0x0:
-      Console::puts("Error Code : Kernel|Read|Not Present\n");
-      break;
-   }
+    // assert(false);
+    switch (_r->err_code & (0x7))
+    {
+    case 0x7:
+        Console::puts("Error Code : User|Write|Protection Fault\n");
+        break;
+    case 0x6:
+        Console::puts("Error Code : User|Write|Not Present\n");
+        break;
+    case 0x5:
+        Console::puts("Error Code : User|Read|Protection Fault\n");
+        break;
+    case 0x4:
+        Console::puts("Error Code : User|Read|Not Present\n");
+        break;
+    case 0x3:
+        Console::puts("Error Code : Kernel|Write|Protection Fault\n");
+        break;
+    case 0x2:
+        Console::puts("Error Code : Kernel|Write|Not Present\n");
+        break;
+    case 0x1:
+        Console::puts("Error Code : Kernel|Read|Protection Fault\n");
+        break;
+    case 0x0:
+        Console::puts("Error Code : Kernel|Read|Not Present\n");
+        break;
+    }
 
-   if ((_r->err_code & 0x1) == 0x0){ // Page not present
-      unsigned long *current_page_directory = (unsigned long *)read_cr3();
-      unsigned long frame_address = (process_mem_pool->get_frames(1)) << 12; //frame address allocated to store the new page
-      unsigned long virtual_address = read_cr2();        //virtual address which triggers page fault
-      unsigned long pde_index = (virtual_address & 0xFFC00000) >> 22;
-      unsigned long pte_index = (virtual_address & 0x003FF000) >> 12; 
-      bool new_table = false;                                                       
+    if ((_r->err_code & 0x1) == 0x0)
+    { // Page not present
+        unsigned long fault_address = read_cr2();  //Get the virtual address that trigger the page fault
+        unsigned long *pde_addr = PageTable::current_page_table->PDE_address(fault_address); //Get the pde virtual address
+        unsigned long *pte_addr = PageTable::current_page_table->PTE_address(fault_address); //Get the pte virtual address
+        bool new_table = false; 
 
-      if ((current_page_directory[pde_index] & 0x1) != 0x1) // PDE is not valid
-      {
-         current_page_directory[pde_index] = (kernel_mem_pool->get_frames(1) << 12); // Allocate frame for a new page table
-         current_page_directory[pde_index] = current_page_directory[pde_index] | 0x3;   //Only kernel/supervisor has the right to modify this entry and this page table is valid now                
-         new_table = true;
-      }
+        if ((*pde_addr & 0x1) != 0x1) // PDE is not valid
+        {
+            *pde_addr = (process_mem_pool->get_frames(1) << 12);  // Allocate frame for a new page table
+            *pde_addr = *pde_addr | 0x3; // Only kernel/supervisor has the right to modify this entry and this page table is valid now
+            new_table = true; 
+        }
 
-      unsigned long *page_table = (unsigned long *)(current_page_directory[pde_index] & 0xFFFFF000); // Pointer to the page table 
-
-      if (new_table) // If it is a new allocated page table 
-      {
-         for (unsigned int i = 0; i < 1024; i++) // Intialize every entry of page table
-         {
-            page_table[i] = 0 | 0x2; 
-         }
-      }
-      page_table[pte_index] = frame_address | 0x3; 
-   }
-   else
-   {
-      Console::puts("Fault was cause by a protection fault, type of access need to be modified\n");
-      assert(false);
-   }
-   Console::puts("handled page fault\n");
+        if (new_table) // If it is a new allocated page table
+        {   
+            unsigned long *new_table_addr=PageTable::current_page_table->PTE_address(fault_address&0xFFC00000);//The first entry of new page table has pte_index=0. So if we find the pte_addr of (fault_address&0xFFC00000)
+            for (unsigned int i = 0; i < 1024; i++) // Intialize every entry of page table
+            {
+                new_table_addr[i] = 0 | 0x2;
+            }
+        }
+        unsigned long frame_address = (process_mem_pool->get_frames(1) << 12);
+        *pte_addr = frame_address | 0x3;
+    }
+    else
+    {
+        Console::puts("Fault was cause by a protection fault, type of access need to be modified\n");
+        assert(false);
+    }
+    Console::puts("handled page fault\n");
 }
 
-void PageTable::register_pool(VMPool * _vm_pool)
+void PageTable::register_pool(VMPool *_vm_pool)
 {
-    //assert(false);
-    //First, check whether _vm_pool is already registered
-    VMPool *cur=vm_pool_list_head;
-    while(cur!=NULL){
-        if(cur==_vm_pool){
+    // assert(false);
+    // First, check whether _vm_pool is already registered
+    VMPool *cur = vm_pool_list_head;
+    while (cur != NULL)
+    {
+        if (cur == _vm_pool)
+        {
             Console::puts("VM pool is registered in the past\n");
             return;
         }
-        cur=cur->next;
+        cur = cur->next;
     }
-    //If not, register it
-    if(vm_pool_list_head==NULL){
-        vm_pool_list_head=_vm_pool;
-        vm_pool_list_tail=_vm_pool;
+    // If not, register it
+    if (vm_pool_list_head == NULL)
+    {
+        vm_pool_list_head = _vm_pool;
+        vm_pool_list_tail = _vm_pool;
     }
-    else{
-        vm_pool_list_tail->next=_vm_pool;
-        vm_pool_list_tail=_vm_pool;
+    else
+    {
+        vm_pool_list_tail->next = _vm_pool;
+        vm_pool_list_tail = _vm_pool;
     }
     Console::puts("registered VM pool\n");
 }
 
-void PageTable::free_page(unsigned long _page_no) {
-    //assert(false);
-    unsigned long addr=(_page_no<<12);
-    //unsigned long* pde_addr=PDE_address(addr);
-    unsigned long* pte_addr=PTE_address(addr);
-    if(*pte_addr & 0x1){
+void PageTable::free_page(unsigned long _page_no)
+{
+    // assert(false);
+    unsigned long addr = (_page_no << 12);
+    // unsigned long* pde_addr=PDE_address(addr);
+    unsigned long *pte_addr = PTE_address(addr);
+    if (*pte_addr & 0x1)
+    {
         ContFramePool::release_frames(*pte_addr >> 12);
-        *pte_addr = *pte_addr & 0xFFFFFFCE; //invalid, unused, undirty
+        *pte_addr = *pte_addr & 0xFFFFFFCE; // invalid, unused, undirty
         unsigned int cr3_read = read_cr3();
         write_cr3(cr3_read);
     }

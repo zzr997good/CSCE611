@@ -58,7 +58,7 @@ private:
    region_node *free_list;
    unsigned long no_of_allocated;
    unsigned long no_of_freed;
-   
+   bool set_first_page;
 public:
    VMPool *next;
    VMPool(unsigned long  _base_address,

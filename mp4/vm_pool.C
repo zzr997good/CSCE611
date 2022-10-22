@@ -83,13 +83,61 @@ VMPool::VMPool(unsigned long  _base_address,
 }
 
 unsigned long VMPool::allocate(unsigned long _size) {
-    assert(false);
-    Console::puts("Allocated region of memory.\n");
+    //assert(false);
+    //Allocate multiples of pages
+    unsigned long _size_mul_of_pages=(_size+Machine::PAGE_SIZE-1)/Machine::PAGE_SIZE*Machine::PAGE_SIZE;
+    bool found=false;
+    int index;
+    for(unsigned long i=0;i<no_of_freed;i++){
+        if(free_list[i].size>=_size_mul_of_pages){
+            index=i;
+            found=true;
+            break;
+        }
+    }
+    if(found){
+        allocated_list[no_of_allocated].base_addr=free_list[index].base_addr;
+        allocated_list[no_of_allocated].size=_size_mul_of_pages;
+        no_of_allocated++;
+
+        //Split the free list node
+        free_list[index].base_addr=free_list[index].base_addr+_size_mul_of_pages;
+        free_list[index].size=free_list[index].size-_size_mul_of_pages;
+        Console::puts("Allocated region of memory.\n");
+        return allocated_list[no_of_allocated-1].base_addr;
+    }
+    else{
+        Console::puts("Memory not enough in pool.\n");
+        return 0;
+    }
 }
 
 void VMPool::release(unsigned long _start_address) {
-    assert(false);
-    Console::puts("Released region of memory.\n");
+    //assert(false);
+    bool found=false;
+    int index;
+    for(unsigned long i=0;i<no_of_allocated;i++){
+        if(allocated_list[i].base_addr==_start_address){
+            index=i;
+            found=true;
+            break;
+        }
+    }
+    if(!found||allocated_list[index].size==0){
+        Console::puts("This address is not allocated.\n");
+        assert(false);
+    }
+    else{
+        free_list[no_of_freed].base_addr=allocated_list[index].base_addr;
+        free_list[no_of_freed].size=allocated_list[index].size;
+        no_of_freed++;
+        allocated_list[index].base_addr=0;
+        allocated_list[index].size=0;
+        unsigned long start_page_no=(_start_address&0xFFFFF000)>>12;
+        unsigned long total_pages=free_list[no_of_freed-1].size/Machine::PAGE_SIZE;
+        for(int i=0;i<total_pages;i++) page_table->free_page(start_page_no+i);
+        Console::puts("Released region of memory.\n");
+    }
 }
 
 bool VMPool::is_legitimate(unsigned long _address) {

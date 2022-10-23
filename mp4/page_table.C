@@ -110,6 +110,19 @@ void PageTable::handle_fault(REGS *_r)
     if ((_r->err_code & 0x1) == 0x0)
     { // Page not present
         unsigned long fault_address = read_cr2();  //Get the virtual address that trigger the page fault
+        bool legitimate=false;
+        VMPool* cur=PageTable::current_page_table->vm_pool_list_head;
+        while(cur!=nullptr){
+            if(cur->is_legitimate(fault_address)) {
+                legitimate=true;
+                break;
+            }
+            cur=cur->next;
+        }
+        if(!legitimate){
+            Console::puts("Page Fault caused by referring a invalid address that is not in allocated region.");
+            assert(false);
+        }
         unsigned long *pde_addr = PageTable::current_page_table->PDE_address(fault_address); //Get the pde virtual address
         unsigned long *pte_addr = PageTable::current_page_table->PTE_address(fault_address); //Get the pte virtual address
         bool new_table = false; 

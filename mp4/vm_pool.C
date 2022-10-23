@@ -74,7 +74,7 @@ VMPool::VMPool(unsigned long  _base_address,
 
     no_of_allocated++;
     no_of_freed++;
-    for(int i=0;i<256;i++){
+    for(int i=1;i<256;i++){
         allocated_list[i].base_addr=0;
         allocated_list[i].size=0;
         free_list[i].base_addr=0;

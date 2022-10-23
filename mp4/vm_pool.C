@@ -68,11 +68,12 @@ VMPool::VMPool(unsigned long  _base_address,
     set_first_page=true;
     allocated_list[0].base_addr=base_address;
     allocated_list[0].size=Machine::PAGE_SIZE;
-    no_of_allocated++;
     free_list[0].base_addr=base_address+Machine::PAGE_SIZE;
-    free_list[0].size=size-Machine::PAGE_SIZE;;
-    no_of_freed++;
+    free_list[0].size=size-Machine::PAGE_SIZE;
     set_first_page=false;
+
+    no_of_allocated++;
+    no_of_freed++;
     for(int i=0;i<256;i++){
         allocated_list[i].base_addr=0;
         allocated_list[i].size=0;
@@ -141,7 +142,20 @@ void VMPool::release(unsigned long _start_address) {
 }
 
 bool VMPool::is_legitimate(unsigned long _address) {
-    assert(false);
+    //assert(false);
     Console::puts("Checked whether address is part of an allocated region.\n");
+        if((set_first_page == true) && (no_of_allocated == 0)&&_address>=base_address&&_address<base_address+Machine::PAGE_SIZE)                       //Only passing true legitimacy check if it's the first entry memory access
+    {
+    	return true;
+    }
+    
+    for(unsigned long i = 0; i<no_of_allocated; i++)                                            //Check all the allocated memory regions
+    {
+    	if((allocated_list[i].base_addr <= _address) && (_address < (allocated_list[i].base_addr + allocated_list[i].size)))
+    	{
+    		return true;
+    	}
+    }
+    return false;
 }
 

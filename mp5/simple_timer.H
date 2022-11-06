@@ -34,7 +34,7 @@
 
 class SimpleTimer : public InterruptHandler {
 
-private:
+protected:
 
   /* How long has the system been running? */
   unsigned long seconds; 
@@ -65,6 +65,16 @@ public :
   /* Wait for a particular time to be passed. The implementation is based 
      on busy looping! */
 
+};
+
+class EOQTimer : public SimpleTimer
+{
+	
+public:
+	EOQTimer(int _hz);
+	void handle_interrupt(REGS *_r);
+	void reset_ticks();
+	int  get_ticks();
 };
 
 #endif

@@ -120,9 +120,9 @@ void EOQTimer::handle_interrupt(REGS *_r) {
     if (ticks >= hz/20 ) 
     {
         //seconds++;
-        ticks = 0;
         /*50mS quantum has passed ; Let's handle the time quantum interupt*/
-        ((RRScheduler *)SYSTEM_SCHEDULER)->quantum_handler();   
+        ((RRScheduler *)SYSTEM_SCHEDULER)->quantum_handler();
+        ticks=0;
     }
 }
 

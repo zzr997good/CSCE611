@@ -39,7 +39,7 @@
    Otherwise, the thread functions don't return, and the threads run forever.
 */
 
-#define _FIFO_SCHEDULING_
+//#define _FIFO_SCHEDULING_
 
 /*--------------------------------------------------------------------------*/
 /* INCLUDES */

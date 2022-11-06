@@ -64,7 +64,7 @@ void SimpleTimer::handle_interrupt(REGS *_r) {
     {
         seconds++;
         ticks = 0;
-        Console::puts("One second has passed\n");
+        Console::puts("One second has passed____________________________________________________________________\n");
     }
 }
 

@@ -97,7 +97,35 @@ public:
       Graciously handle the case where the thread wants to terminate itself.*/
   
 };
-	
+
+
+class FIFOScheduler : public Scheduler{
+public:
+
+   FIFOScheduler();
+   /* FIFO Scheduler construtor*/
+  
+   void yield();
+   /* Called by the currently running thread in order to give up the CPU. 
+      The scheduler selects the next thread from the ready queue to load onto 
+      the CPU, and calls the dispatcher function defined in 'Thread.H' to
+      do the context switch. */
+
+   void resume(Thread * _thread);
+   /* Add the given thread to the ready queue of the scheduler. This is called
+      for threads that were waiting for an event to happen, or that have 
+      to give up the CPU in response to a preemption. */
+
+
+   void terminate(Thread * _thread);
+   /* Remove the given thread from the scheduler in preparation for destruction
+      of the thread. 
+      Graciously handle the case where the thread wants to terminate itself.*/
+};
+
+
+class RRScheduler : public Scheduler{  
+};
 	
 
 #endif

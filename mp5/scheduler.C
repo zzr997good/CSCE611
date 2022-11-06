@@ -46,22 +46,36 @@
 /*--------------------------------------------------------------------------*/
 
 Scheduler::Scheduler() {
-  assert(false);
+  //assert(false);
+  head=nullptr;
+  tail=nullptr;
   Console::puts("Constructed Scheduler.\n");
 }
 
 void Scheduler::yield() {
-  assert(false);
+  Console::puts("Virtual Scheduler::yield().... \n");
+  //assert(false);
 }
 
 void Scheduler::resume(Thread * _thread) {
-  assert(false);
+  Console::puts("Virtual Scheduler::resume().... \n");
+  //assert(false);
 }
 
 void Scheduler::add(Thread * _thread) {
-  assert(false);
+  Console::puts("Virtual Scheduler::resume().... \n");
+  //assert(false);
 }
 
 void Scheduler::terminate(Thread * _thread) {
-  assert(false);
+  Console::puts("Virtual Scheduler::terminate().... \n");
+  //assert(false);
+}
+
+FIFOScheduler::FIFOScheduler(){
+   Console::puts("Constructed FIFOScheduler.\n"); 
+}
+
+void FIFOScheduler::yield(){
+  
 }

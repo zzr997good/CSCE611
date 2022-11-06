@@ -22,6 +22,7 @@
 #include "utils.H"
 #include "assert.H"
 #include "simple_keyboard.H"
+#include "mem_pool.H"
 
 /*--------------------------------------------------------------------------*/
 /* DATA STRUCTURES */
@@ -40,7 +41,7 @@
 /*--------------------------------------------------------------------------*/
 
 /* -- (none) -- */
-
+extern MemPool * MEMORY_POOL;
 /*--------------------------------------------------------------------------*/
 /* METHODS FOR CLASS   S c h e d u l e r  */
 /*--------------------------------------------------------------------------*/
@@ -77,5 +78,24 @@ FIFOScheduler::FIFOScheduler(){
 }
 
 void FIFOScheduler::yield(){
-  
+  Console::puts("----FIFOScheduler::yield()----\n");
+  Console::puts("Disable Interrupts....\n");
+  Machine::disable_interrupts();
+  tcb* next=head;
+  if(next==nullptr){
+    Console::puts("The ready queue is empty!");
+    assert(false);
+  }
+  if(head->next==nullptr){
+    Console::puts("Notice:Next thread is the last thread waiting for service!");
+  }
+  head=head->next;
+  Machine::enable_interrupts();
+  Console::puts("Enable Interrupts....\n");
+  Thread::dispatch_to(next->thread);
+  Console::puts("Dispatching Tread to:");
+  Console::puti(next->thread->ThreadId()+1);
+  Console::puts("....\n");
+  Console::puts("----FIFOScheduler::yield() Successfully----");
+  MEMORY_POOL->release((unsigned long)next); 
 }

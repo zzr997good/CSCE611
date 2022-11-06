@@ -157,7 +157,7 @@ public:
       of the thread. 
       Graciously handle the case where the thread wants to terminate itself.*/
 
-   void quantim_handler();
+   void quantum_handler();
 };
 	
 

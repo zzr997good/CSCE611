@@ -98,3 +98,40 @@ void SimpleTimer::wait(unsigned long _seconds) {
 
     while((seconds <= then_seconds) && (ticks < now_ticks));
 }
+/*--------------------------------------------------------------------------*/
+/* METHODS FOR CLASS   EOQ T i m e r */
+/*--------------------------------------------------------------------------*/
+
+EOQTimer::EOQTimer(int _hz): SimpleTimer(_hz){
+  /* How long has the system been running? */
+  Console::puts("----EOQTimer Constructed Successfully----\n");
+}
+
+void EOQTimer::handle_interrupt(REGS *_r) {
+/* What to do when timer interrupt occurs? In this case, we update "ticks",
+   and maybe update "seconds".
+   This must be installed as the interrupt handler for the timer in the 
+   when the system gets initialized. (e.g. in "kernel.C") */
+
+    /* Increment our "ticks" count */
+    ticks++;
+
+    /* We define the quantum as 50ms,which needs 50/(1000/hz)=hz/20 ticks */
+    if (ticks >= hz/20 ) 
+    {
+        //seconds++;
+        ticks = 0;
+        /*50mS quantum has passed ; Let's handle the time quantum interupt*/
+        ((RRScheduler *)SYSTEM_SCHEDULER)->quantum_handler();   
+    }
+}
+
+void EOQTimer::reset_ticks()
+{
+	ticks = 0;
+}
+
+int EOQTimer::get_ticks()
+{
+	return ticks;
+}

@@ -127,3 +127,28 @@ void FIFOScheduler::add(Thread* _thread){
   Console::puts("....\n");
   Console::puts("----FIFOScheduler::add() Successfully----\n");
 }
+
+void FIFOScheduler::terminate(Thread* _thread){
+  Console::puts("----FIFOScheduler::terminate()----\n");
+  if(Thread::CurrentThread()==_thread){
+  //If the current running thread needs to be terminated 
+      yield();
+  }
+  //If the thread needed to be terminated is in ready queue
+	else if(head->thread == _thread)          
+	{
+		tcb* curr = head;
+		head = head->next;
+    Console::puts("Releasing tcb memory....\n");
+		MEMORY_POOL->release((unsigned long)curr);
+	}
+	else                                     
+	{
+		tcb* prev = head;
+		while(prev->next->thread != _thread)
+			prev = prev->next;
+		tcb* curr = prev->next;
+		prev ->next = curr->next;
+		MEMORY_POOL->release((unsigned long)curr);
+	}
+}

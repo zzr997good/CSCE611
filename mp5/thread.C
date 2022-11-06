@@ -37,11 +37,16 @@
 
 #include "threads_low.H"
 
+#include "scheduler.H"
+#include "mem_pool.H"
+
 /*--------------------------------------------------------------------------*/
 /* EXTERNS */
 /*--------------------------------------------------------------------------*/
 
 Thread * current_thread = 0;
+extern Scheduler *SYSTEM_SCHEDULER;
+extern MemPool *MEMORY_POOL;
 /* Pointer to the currently running thread. This is used by the scheduler,
    for example. */
 
@@ -72,8 +77,14 @@ static void thread_shutdown() {
        It terminates the thread by releasing memory and any other resources held by the thread. 
        This is a bit complicated because the thread termination interacts with the scheduler.
      */
-
-    assert(false);
+    Console::puts("----Thread::thread_shutdown()----\n");
+    Thread* curr = Thread::CurrentThread();
+    Console::puts("Thread with Thread Id ");Console::putui(current_thread->ThreadId());Console::puts(" about to be shutdown\n");
+    SYSTEM_SCHEDULER->terminate(curr);
+    MEMORY_POOL->release((unsigned long) curr);
+    Console::puts("Releasing thread memory....\n");
+    Console::puts("----Thread::thread_shutdown() Successfully----\n");
+    //assert(false);
     /* Let's not worry about it for now. 
        This means that we should have non-terminating thread functions. 
     */
@@ -116,7 +127,7 @@ void Thread::setup_context(Thread_Function _tfunction){
      * thread starts.
      */
     /* ---- EFLAGS */
-    push(0);
+    push(0|1<<9);
     /* Clear the IF bit to disable interrupts when thread starts. */
 
     /* ---- CS and EIP REGISTERS */

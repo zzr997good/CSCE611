@@ -90,12 +90,13 @@ void FIFOScheduler::yield(){
     Console::puts("Notice:Next thread is the last thread waiting for service!\n");
   }
   head=head->next;
+  Console::puts("Dispatching Thread to:");
+  Console::puti(next_thread->thread->ThreadId());
+  Console::puts("\n");
+
   Machine::enable_interrupts();
   Console::puts("Enable Interrupts....\n");
   Thread::dispatch_to(next_thread->thread);
-  Console::puts("Dispatching Thread to:");
-  Console::puti(next_thread->thread->ThreadId());
-  Console::puts("....\n");
   Console::puts("----FIFOScheduler::yield() Successfully----\n");
   MEMORY_POOL->release((unsigned long)next_thread); 
 }
@@ -115,7 +116,7 @@ void FIFOScheduler::resume(Thread* _thread){
   }
   Console::puts("Resume a thread:");
   Console::puti(_thread->ThreadId());
-  Console::puts("....\n");
+  Console::puts("\n");
   Console::puts("----FIFOScheduler::resume() Successfully----\n");
 }
 
@@ -134,7 +135,7 @@ void FIFOScheduler::add(Thread* _thread){
   }
   Console::puts("Add a new thread:");
   Console::puti(_thread->ThreadId());
-  Console::puts("....\n");
+  Console::puts("\n");
   Console::puts("----FIFOScheduler::add() Successfully----\n");
 }
 

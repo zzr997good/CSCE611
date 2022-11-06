@@ -91,7 +91,7 @@ void FIFOScheduler::yield(){
   }
   head=head->next;
   Console::puts("Dispatching Thread to:");
-  Console::puti(next_thread->thread->ThreadId());
+  Console::puti(next_thread->thread->ThreadId()+1);
   Console::puts("\n");
 
   Machine::enable_interrupts();
@@ -115,7 +115,7 @@ void FIFOScheduler::resume(Thread* _thread){
     tail=last;
   }
   Console::puts("Resume a thread:");
-  Console::puti(_thread->ThreadId());
+  Console::puti(_thread->ThreadId()+1);
   Console::puts("\n");
   Console::puts("----FIFOScheduler::resume() Successfully----\n");
 }
@@ -134,7 +134,7 @@ void FIFOScheduler::add(Thread* _thread){
     tail=last;
   }
   Console::puts("Add a new thread:");
-  Console::puti(_thread->ThreadId());
+  Console::puti(_thread->ThreadId()+1);
   Console::puts("\n");
   Console::puts("----FIFOScheduler::add() Successfully----\n");
 }

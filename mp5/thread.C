@@ -79,7 +79,7 @@ static void thread_shutdown() {
      */
     Console::puts("----Thread::thread_shutdown()----\n");
     Thread* curr = Thread::CurrentThread();
-    Console::puts("Thread with Thread Id ");Console::putui(current_thread->ThreadId());Console::puts(" about to be shutdown\n");
+    Console::puts("Thread with Thread Id ");Console::putui(current_thread->ThreadId()+1);Console::puts(" about to be shutdown\n");
     SYSTEM_SCHEDULER->terminate(curr);
     MEMORY_POOL->release((unsigned long) curr);
     Console::puts("Releasing thread memory....\n");

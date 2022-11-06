@@ -94,7 +94,7 @@ void FIFOScheduler::yield(){
   Console::puts("Enable Interrupts....\n");
   Thread::dispatch_to(next->thread);
   Console::puts("Dispatching Tread to:");
-  Console::puti(next->thread->ThreadId()+1);
+  Console::puti(next->thread->ThreadId());
   Console::puts("....\n");
   Console::puts("----FIFOScheduler::yield() Successfully----\n");
   MEMORY_POOL->release((unsigned long)next); 
@@ -102,9 +102,19 @@ void FIFOScheduler::yield(){
 
 void FIFOScheduler::resume(Thread* _thread){
   Console::puts("----FIFOScheduler::resume()----\n");
-  add(_thread);
-  Console::puts("Resume a new thread:\n");
-  Console::puti(_thread->ThreadId()+1);
+  tcb * last=(tcb*)(MEMORY_POOL->allocate(sizeof(tcb)));
+  last->thread=_thread;
+  last->next=nullptr;
+  if(head==nullptr&&tail==nullptr) {
+    head=last;
+    tail=last;
+  }
+  else{
+    tail->next=last;
+    tail=last;
+  }
+  Console::puts("Resume a thread:\n");
+  Console::puti(_thread->ThreadId());
   Console::puts("....\n");
   Console::puts("----FIFOScheduler::resume() Successfully----\n");
 }
@@ -123,7 +133,7 @@ void FIFOScheduler::add(Thread* _thread){
     tail=last;
   }
   Console::puts("Add a new thread:");
-  Console::puti(_thread->ThreadId()+1);
+  Console::puti(_thread->ThreadId());
   Console::puts("....\n");
   Console::puts("----FIFOScheduler::add() Successfully----\n");
 }
@@ -149,6 +159,8 @@ void FIFOScheduler::terminate(Thread* _thread){
 			prev = prev->next;
 		tcb* curr = prev->next;
 		prev ->next = curr->next;
+    Console::puts("Releasing tcb memory....\n");
 		MEMORY_POOL->release((unsigned long)curr);
 	}
+  Console::puts("----FIFOScheduler::terminate() Successfully----\n");
 }

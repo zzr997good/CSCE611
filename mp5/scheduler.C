@@ -81,8 +81,8 @@ void FIFOScheduler::yield(){
   Console::puts("----FIFOScheduler::yield()----\n");
   Console::puts("Disable Interrupts....\n");
   Machine::disable_interrupts();
-  tcb* next=head;
-  if(next==nullptr){
+  tcb* next_thread=head;
+  if(next_thread==nullptr){
     Console::puts("The ready queue is empty!");
     assert(false);
   }
@@ -92,12 +92,12 @@ void FIFOScheduler::yield(){
   head=head->next;
   Machine::enable_interrupts();
   Console::puts("Enable Interrupts....\n");
-  Thread::dispatch_to(next->thread);
-  Console::puts("Dispatching Tread to:");
-  Console::puti(next->thread->ThreadId());
+  Thread::dispatch_to(next_thread->thread);
+  Console::puts("Dispatching Thread to:");
+  Console::puti(next_thread->thread->ThreadId());
   Console::puts("....\n");
   Console::puts("----FIFOScheduler::yield() Successfully----\n");
-  MEMORY_POOL->release((unsigned long)next); 
+  MEMORY_POOL->release((unsigned long)next_thread); 
 }
 
 void FIFOScheduler::resume(Thread* _thread){

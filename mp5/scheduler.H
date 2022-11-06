@@ -127,7 +127,37 @@ public:
 };
 
 
-class RRScheduler : public Scheduler{  
+class RRScheduler : public Scheduler{
+private:
+
+   bool quantum_fired;
+public:
+
+   RRScheduler();
+   /* FIFO Scheduler construtor*/
+  
+   void yield();
+   /* Called by the currently running thread in order to give up the CPU. 
+      The scheduler selects the next thread from the ready queue to load onto 
+      the CPU, and calls the dispatcher function defined in 'Thread.H' to
+      do the context switch. */
+
+   void resume(Thread * _thread);
+   /* Add the given thread to the ready queue of the scheduler. This is called
+      for threads that were waiting for an event to happen, or that have 
+      to give up the CPU in response to a preemption. */
+
+   void add(Thread *_thread);
+      /* Make the given thread runnable by the scheduler. This function is called
+      after thread creation. Depending on implementation, this function may 
+      just add the thread to the ready queue, using 'resume'. */
+
+   void terminate(Thread * _thread);
+   /* Remove the given thread from the scheduler in preparation for destruction
+      of the thread. 
+      Graciously handle the case where the thread wants to terminate itself.*/
+
+   void quantim_handler();
 };
 	
 

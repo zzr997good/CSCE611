@@ -116,7 +116,11 @@ public:
       for threads that were waiting for an event to happen, or that have 
       to give up the CPU in response to a preemption. */
 
-
+   void add(Thread *_thread);
+      /* Make the given thread runnable by the scheduler. This function is called
+      after thread creation. Depending on implementation, this function may 
+      just add the thread to the ready queue, using 'resume'. */
+      
    void terminate(Thread * _thread);
    /* Remove the given thread from the scheduler in preparation for destruction
       of the thread. 

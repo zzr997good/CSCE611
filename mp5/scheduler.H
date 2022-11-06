@@ -9,6 +9,12 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+
+/*--------------------------------------------------------------------------*/
+/* INCLUDES */
+/*--------------------------------------------------------------------------*/
+#include "simple_timer.H"
+#include "thread.H"
 /*--------------------------------------------------------------------------*/
 /* DEFINES */
 /*--------------------------------------------------------------------------*/
@@ -19,13 +25,6 @@ typedef struct tcb_node_s
 	Thread * thread;
 	struct tcb_node_s* next;
 }tcb;
-
-/*--------------------------------------------------------------------------*/
-/* INCLUDES */
-/*--------------------------------------------------------------------------*/
-#include "simple_timer.H"
-#include "thread.H"
-
 /*--------------------------------------------------------------------------*/
 /* !!! IMPLEMENTATION HINT !!! */
 /*--------------------------------------------------------------------------*/
@@ -120,7 +119,7 @@ public:
       /* Make the given thread runnable by the scheduler. This function is called
       after thread creation. Depending on implementation, this function may 
       just add the thread to the ready queue, using 'resume'. */
-      
+
    void terminate(Thread * _thread);
    /* Remove the given thread from the scheduler in preparation for destruction
       of the thread. 

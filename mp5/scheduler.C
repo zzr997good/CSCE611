@@ -113,7 +113,7 @@ void FIFOScheduler::resume(Thread* _thread){
     tail->next=last;
     tail=last;
   }
-  Console::puts("Resume a thread:\n");
+  Console::puts("Resume a thread:");
   Console::puti(_thread->ThreadId());
   Console::puts("....\n");
   Console::puts("----FIFOScheduler::resume() Successfully----\n");

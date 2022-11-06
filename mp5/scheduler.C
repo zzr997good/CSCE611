@@ -197,7 +197,6 @@ void RRScheduler::yield()
   {
     // This thread yields control to other thread voluntarily
     Console::puts("yield voluntarily\n");
-    timer->reset_ticks();
   }
   else
   {

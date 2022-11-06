@@ -292,7 +292,7 @@ int main() {
     /* -- ENABLE INTERRUPTS -- */
 
     //Machine::enable_interrupts();
-
+    
     /* -- MOST OF WHAT WE NEED IS SETUP. THE KERNEL CAN START. */
 
     Console::puts("Hello World!\n");

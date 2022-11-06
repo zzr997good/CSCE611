@@ -14,11 +14,16 @@
 /*--------------------------------------------------------------------------*/
 
 /* -- (none) -- */
+typedef struct tcb_node_s
+{
+	Thread * thread;
+	struct tcb_node_s* next;
+}tcb;
 
 /*--------------------------------------------------------------------------*/
 /* INCLUDES */
 /*--------------------------------------------------------------------------*/
-
+#include "simple_timer.H"
 #include "thread.H"
 
 /*--------------------------------------------------------------------------*/
@@ -57,7 +62,9 @@
 class Scheduler {
 
   /* The scheduler may need private members... */
-  
+protected:
+   tcb* head;
+   tcb* tail;
 public:
 
    Scheduler();

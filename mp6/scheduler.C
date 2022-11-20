@@ -88,7 +88,7 @@ void FIFOScheduler::yield()
 {
   Console::puts("----FIFOScheduler::yield()----\n");
   Console::puts("Disable Interrupts....\n");
-  Machine::disable_interrupts();
+  //Machine::disable_interrupts();
   tcb *next_thread = head;
   if (next_thread == nullptr)
   {
@@ -104,7 +104,7 @@ void FIFOScheduler::yield()
   Console::puti(next_thread->thread->ThreadId() + 1);
   Console::puts("\n");
 
-  Machine::enable_interrupts();
+  //Machine::enable_interrupts();
   Console::puts("Enable Interrupts....\n");
   Thread::dispatch_to(next_thread->thread);
   Console::puts("----FIFOScheduler::yield() Successfully----\n");

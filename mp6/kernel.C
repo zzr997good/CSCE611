@@ -25,7 +25,7 @@
    Otherwise, no scheduler is used, and the threads pass control to each 
    other in a co-routine fashion.
 */
-
+//#define _DISK_MIRRORING
 #define MB * (0x1 << 20)
 #define KB * (0x1 << 10)
 
@@ -53,7 +53,7 @@
 #endif
 
 #include "blocking_disk.H"    /* DISK DEVICE */
-                            /* YOU MAY NEED TO INCLUDE blocking_disk.H
+#include "mirrored_disk.H"                             /* YOU MAY NEED TO INCLUDE blocking_disk.H
 /*--------------------------------------------------------------------------*/
 /* MEMORY MANAGEMENT */
 /*--------------------------------------------------------------------------*/
@@ -289,9 +289,12 @@ int main() {
 #endif
 
     /* -- DISK DEVICE -- */
-
+#ifdef _DISK_MIRRORING 
+    /* O P T I O N 1 :  M I R R O R E D   D I S K */
+    SYSTEM_DISK = new MirroredDisk(DISK_ID::MASTER, SYSTEM_DISK_SIZE);                
+#else
     SYSTEM_DISK = new BlockingDisk(DISK_ID::MASTER, SYSTEM_DISK_SIZE);
-   
+#endif
     /* NOTE: The timer chip starts periodically firing as 
              soon as we enable interrupts.
              It is important to install a timer handler, as we 

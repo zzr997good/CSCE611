@@ -27,13 +27,20 @@
 /* DATA STRUCTURES */ 
 /*--------------------------------------------------------------------------*/
 
-/* -- (none) -- */
+typedef struct rw_request_s
+{
+	DISK_OPERATION op;
+	unsigned long  rw_block_no;
+	unsigned char* buf;
+}rw_request_node;
 
 /*--------------------------------------------------------------------------*/
 /* B l o c k i n g D i s k  */
 /*--------------------------------------------------------------------------*/
 
 class BlockingDisk : public SimpleDisk {
+   rw_request_node* saved_request;
+
 public:
    BlockingDisk(DISK_ID _disk_id, unsigned int _size); 
    /* Creates a BlockingDisk device with the given size connected to the 
@@ -43,6 +50,8 @@ public:
       disk controller. */
 
    /* DISK OPERATIONS */
+
+   virtual void wait_until_ready();
 
    virtual void read(unsigned long _block_no, unsigned char * _buf);
    /* Reads 512 Bytes from the given block of the disk and copies them 

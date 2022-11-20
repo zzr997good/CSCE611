@@ -52,6 +52,7 @@ void BlockingDisk::wait_until_ready(){
 void BlockingDisk::read(unsigned long _block_no, unsigned char * _buf) {
   issue_operation(DISK_OPERATION::READ, _block_no);
   wait_until_ready();
+  Console::puts("Device is ready, performing the read operation\n "); 
   int i;
   unsigned short tmpw;
   for (i = 0; i < 256; i++) {
@@ -64,6 +65,13 @@ void BlockingDisk::read(unsigned long _block_no, unsigned char * _buf) {
 
 
 void BlockingDisk::write(unsigned long _block_no, unsigned char * _buf) {
-  // -- REPLACE THIS!!!
-  SimpleDisk::write(_block_no, _buf);
+  issue_operation(DISK_OPERATION::WRITE,_block_no);
+  wait_until_ready();
+  Console::puts("Device is ready, performing the write operation\n "); 
+  int i; 
+  unsigned short tmpw;
+  for (i = 0; i < 256; i++) {
+    tmpw = _buf[2*i] | (_buf[2*i+1] << 8);
+    Machine::outportw(0x1F0, tmpw);
+  }
 }

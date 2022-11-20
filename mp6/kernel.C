@@ -25,7 +25,7 @@
    Otherwise, no scheduler is used, and the threads pass control to each 
    other in a co-routine fashion.
 */
-//#define _DISK_MIRRORING
+#define _DISK_MIRRORING
 #define MB * (0x1 << 20)
 #define KB * (0x1 << 10)
 

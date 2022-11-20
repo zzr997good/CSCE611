@@ -284,13 +284,13 @@ int main() {
 
     /* -- SCHEDULER -- IF YOU HAVE ONE -- */
   
-    SYSTEM_SCHEDULER = new Scheduler();
+    SYSTEM_SCHEDULER = new FIFOScheduler();
 
 #endif
 
     /* -- DISK DEVICE -- */
 
-    SYSTEM_DISK = new SimpleDisk(DISK_ID::MASTER, SYSTEM_DISK_SIZE);
+    SYSTEM_DISK = new BlockingDisk(DISK_ID::MASTER, SYSTEM_DISK_SIZE);
    
     /* NOTE: The timer chip starts periodically firing as 
              soon as we enable interrupts.

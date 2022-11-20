@@ -1,5 +1,5 @@
 /*
-     File        : blocking_disk.H
+     File        : mirrored_disk.H
 
      Author      : 
 
@@ -8,8 +8,8 @@
 
 */
 
-#ifndef _BLOCKING_DISK_H_
-#define _BLOCKING_DISK_H_
+#ifndef _MIRRORED_DISK_H_
+#define _MIRRORED_DISK_H_
 
 /*--------------------------------------------------------------------------*/
 /* DEFINES */
@@ -26,31 +26,33 @@
 /*--------------------------------------------------------------------------*/
 /* DATA STRUCTURES */ 
 /*--------------------------------------------------------------------------*/
-
 /*--------------------------------------------------------------------------*/
-/* B l o c k i n g D i s k  */
+/* M i r r o r e d D i s k  */
 /*--------------------------------------------------------------------------*/
 
-class BlockingDisk : public SimpleDisk {
+class MirroredDisk : public SimpleDisk {
+
+//master & dependent drives of the same controller
+SimpleDisk* master;
+SimpleDisk* dependent;  
 public:
-   BlockingDisk(DISK_ID _disk_id, unsigned int _size); 
-   /* Creates a BlockingDisk device with the given size connected to the 
-      MASTER or SLAVE slot of the primary ATA controller.
-      NOTE: We are passing the _size argument out of laziness. 
-      In a real system, we would infer this information from the 
-      disk controller. */
+   MirroredDisk(DISK_ID _disk_id, unsigned int _size); 
+   /* Creates a MirroredDisk device with the given size connected to the 
+    */
+      
 
-   /* DISK OPERATIONS */
-
-   virtual void wait_until_ready();
-
-   virtual void read(unsigned long _block_no, unsigned char * _buf);
+   void read(unsigned long _block_no, unsigned char * _buf);
    /* Reads 512 Bytes from the given block of the disk and copies them 
       to the given buffer. No error check! */
 
-   virtual void write(unsigned long _block_no, unsigned char * _buf);
+   void write(unsigned long _block_no, unsigned char * _buf);
    /* Writes 512 Bytes from the buffer to the given block on the disk. */
+   
+   //void wait_and_process();
+   /*waits non-blockingly (yields if the device is not ready) and then processes the io request when the device is ready*/
+   
+   void issue_mirrored_operation(DISK_ID _disk_id, DISK_OPERATION _op, unsigned long _block_no);
+   /*Issues 2 simulatneous commands to both of the drives*/
 
 };
-
 #endif

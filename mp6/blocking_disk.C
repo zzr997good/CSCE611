@@ -34,7 +34,6 @@ extern Scheduler * SYSTEM_SCHEDULER;
 
 BlockingDisk::BlockingDisk(DISK_ID _disk_id, unsigned int _size) 
   : SimpleDisk(_disk_id, _size) {
-    //saved_request = (rw_request_node*)(MEMORY_POOL->allocate(sizeof(rw_request_node)));
     Console::puts("BlockingDisk constructed.\n");
 }
 

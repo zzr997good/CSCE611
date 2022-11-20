@@ -55,10 +55,6 @@ protected:
      /* -- HERE WE CAN DEFINE THE BEHAVIOR OF DERIVED DISKS */ 
      void issue_operation(DISK_OPERATION _op, unsigned long _block_no);   
 
-     
-     virtual bool is_ready();
-     /* Return true if disk is ready to transfer data from/to disk, false otherwise. */
-
      virtual void wait_until_ready() {
         while (!is_ready()) { /* wait */; }
      }
@@ -69,7 +65,8 @@ protected:
         and return to check later. */
 
 public:
-
+   virtual bool is_ready();
+     /* Return true if disk is ready to transfer data from/to disk, false otherwise. */
    SimpleDisk(DISK_ID _disk_id, unsigned int _size); 
    /* Creates a SimpleDisk device with the given size connected to the MASTER or 
       DEPENDENT slot of the primary ATA controller.

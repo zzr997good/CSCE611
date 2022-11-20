@@ -114,8 +114,6 @@ void MirroredDisk::write(unsigned long _block_no, unsigned char * _buf) {
         Console::puts("Dependent disk is not ready, voluntarily yielding thread\n ");  
         SYSTEM_SCHEDULER->yield();
       }
-      int i; 
-      unsigned short tmpw;
       for (i = 0; i < 256; i++) {
         tmpw = _buf[2*i] | (_buf[2*i+1] << 8);
         Machine::outportw(0x1F0, tmpw);
@@ -136,8 +134,6 @@ void MirroredDisk::write(unsigned long _block_no, unsigned char * _buf) {
         Console::puts("Dependent disk is not ready, voluntarily yielding thread\n ");  
         SYSTEM_SCHEDULER->yield();
       }
-      int i; 
-      unsigned short tmpw;
       for (i = 0; i < 256; i++) {
         tmpw = _buf[2*i] | (_buf[2*i+1] << 8);
         Machine::outportw(0x1F0, tmpw);

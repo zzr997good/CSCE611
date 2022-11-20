@@ -52,6 +52,13 @@ void BlockingDisk::wait_until_ready(){
 void BlockingDisk::read(unsigned long _block_no, unsigned char * _buf) {
   issue_operation(DISK_OPERATION::READ, _block_no);
   wait_until_ready();
+  int i;
+  unsigned short tmpw;
+  for (i = 0; i < 256; i++) {
+    tmpw = Machine::inportw(0x1F0);
+    _buf[i*2]   = (unsigned char)tmpw;
+    _buf[i*2+1] = (unsigned char)(tmpw >> 8);
+  }
 
 }
 

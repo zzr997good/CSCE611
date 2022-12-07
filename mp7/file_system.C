@@ -32,11 +32,13 @@
    inodes from and to disk. */
 
 void Inode::ReadFromDisk(){
-    fs->disk->read(INODES_BLOCK_NO, (unsigned char *)(fs->inodes));
+    fs->ReadBlockFromDisk(INODES_BLOCK_NO,(unsigned char *)(fs->inodes));
+    //fs->disk->read(INODES_BLOCK_NO, (unsigned char *)(fs->inodes));
 }
 
 void Inode::WriteToDisk(){
-    fs->disk->write(INODES_BLOCK_NO, (unsigned char *)(fs->inodes));
+    fs->WriteBlockToDisk(INODES_BLOCK_NO,(unsigned char *)(fs->inodes));
+    //fs->disk->write(INODES_BLOCK_NO, (unsigned char *)(fs->inodes));
 }
 /*--------------------------------------------------------------------------*/
 /* CLASS FileSystem */

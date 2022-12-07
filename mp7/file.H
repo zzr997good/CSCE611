@@ -49,7 +49,10 @@ private:
        file system. 
        You may also want a current position, which indicates which position in 
        the file you will read or write next. */
-    
+
+    FileSystem *fs; //From *fs, I know which disk I belong to
+    Inode  *inode; //From *inode, I know my id, my size and my block no
+    unsigned long current_pos;
     unsigned char block_cache[SimpleDisk::BLOCK_SIZE];
     /* It will be helpful to have a cached copy of the block that you are reading
        from and writing to. In the base submission, files have only one block, which

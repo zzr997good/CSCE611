@@ -43,7 +43,8 @@ File::~File() {
     /* Make sure that you write any cached data to disk. */
     /* Also make sure that the inode in the inode list is updated. */
     fs->WriteBlockToDisk(inode->block_no,block_cache);
-    fs->WriteBlockToDisk(INODES_BLOCK_NO,(unsigned char*)inode);
+    //Because the fs->inodes is private member, we have to use its friend class inode to write inode list to disk
+    inode->WriteToDisk();
 }
 
 /*--------------------------------------------------------------------------*/
@@ -53,20 +54,42 @@ File::~File() {
 int File::Read(unsigned int _n, char *_buf) {
     Console::puts("reading from file\n");
     //assert(false);
-    
+    unsigned int count = 0;
+    while(!EoF() && (count<_n))
+    {
+    	_buf[count] = block_cache[current_pos];
+    	count++;
+    	current_pos++;
+    }
+    if(EoF()) Reset();
+    return count;
 }
 
 int File::Write(unsigned int _n, const char *_buf) {
     Console::puts("writing to file\n");
-    assert(false);
+    unsigned int count = 0;
+    if(_n > SimpleDisk::BLOCK_SIZE)    //The maximum size is 512B
+    _n = SimpleDisk::BLOCK_SIZE;
+    while(count<_n)
+    {
+    	if(EoF()) Reset();
+    	block_cache[current_pos] = _buf[count];
+    	count++;
+    	current_pos++;
+    }
+    if(current_pos+1>inode->size)   inode->size=current_pos+1;
+    return count; 
+    //assert(false);
 }
 
 void File::Reset() {
     Console::puts("resetting file\n");
-    assert(false);
+    current_pos=0;
+    //assert(false);
 }
 
 bool File::EoF() {
     Console::puts("checking for EoF\n");
-    assert(false);
+    return current_pos==SimpleDisk::BLOCK_SIZE;
+    //assert(false);
 }

@@ -51,6 +51,8 @@ File::~File() {
 /* FILE FUNCTIONS */
 /*--------------------------------------------------------------------------*/
 
+//The size of the file will not be changed in read operation
+//So we just need to make sure the size of file is no more than 512B in write operation
 int File::Read(unsigned int _n, char *_buf) {
     Console::puts("reading from file\n");
     //assert(false);
@@ -61,23 +63,27 @@ int File::Read(unsigned int _n, char *_buf) {
     	count++;
     	current_pos++;
     }
-    if(EoF()) Reset();
     return count;
 }
 
+//Here we need to make sure the file size is no more than 512B
 int File::Write(unsigned int _n, const char *_buf) {
     Console::puts("writing to file\n");
     unsigned int count = 0;
-    if(_n > SimpleDisk::BLOCK_SIZE)    //The maximum size is 512B
-    _n = SimpleDisk::BLOCK_SIZE;
-    while(count<_n)
+    if(_n > SimpleDisk::BLOCK_SIZE){
+        _n = SimpleDisk::BLOCK_SIZE;
+        Console::puts("You can write at most 512 Byte to the file\n");
+    }
+    unsigned int end_possition=current_pos+_n;
+    //if(end_possition<=inode->size) There is no need to enlarge the file
+    //if(end_possition>inode->size) we have to extend the file and make sure the file is no more than 512B
+    if(end_possition>inode->size) inode->size=(end_possition<=SimpleDisk::BLOCK_SIZE?end_possition:SimpleDisk::BLOCK_SIZE);
+    while(!EoF() && (count<_n))
     {
-    	if(EoF()) Reset();
     	block_cache[current_pos] = _buf[count];
     	count++;
     	current_pos++;
     }
-    if(current_pos+1>inode->size)   inode->size=current_pos+1;
     return count; 
     //assert(false);
 }
@@ -90,6 +96,6 @@ void File::Reset() {
 
 bool File::EoF() {
     Console::puts("checking for EoF\n");
-    return current_pos==SimpleDisk::BLOCK_SIZE;
+    return current_pos==inode->size;
     //assert(false);
 }
